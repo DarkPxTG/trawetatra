@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>جدول پوپ 💩</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(to bottom, #1e1e1e, #000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #00ffcc;
+      margin-bottom: 10px;
+    }
+
+    .info {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 65px);
+      gap: 12px;
+    }
+
+    .cell {
+      width: 65px;
+      height: 65px;
+      background: #2a2a2a;
+      border: 2px solid #444;
+      border-radius: 12px;
+      font-size: 28px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .cell:hover {
+      background: #444;
+      transform: scale(1.05);
+    }
+
+    .revealed {
+      background: #555 !important;
+      cursor: default;
+    }
+
+    .bomb {
+      background: #ff0033 !important;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #00ffcc;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #00e6b8;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(5, 55px);
+        gap: 10px;
+      }
+
+      .cell {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>جدول پوپ</h1>
+
+  <div class="info">
+    مبلغ شرط شما: <span id="bet-amount">--</span> تومان <br>
+    سود فعلی: <span id="profit">0</span> تومان
+  </div>
+
+  <div class="grid" id="gameGrid"></div>
+
+  <button class="btn" onclick="cashOut()">💸 برداشت</button>
+
+  <script>
+    const grid = document.getElementById("gameGrid");
+    const betAmount = localStorage.getItem("betAmount") || 10000;
+    const multiplierStep = 0.3; // هر خانه چقدر سود بدهد
+    let revealed = 0;
+    let profit = 0;
+    const totalCells = 25;
+    const bombCount = 5;
+
+    document.getElementById("bet-amount").textContent = betAmount;
+
+    // ساخت جدول
+    const bombIndexes = generateRandomBombs(bombCount);
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.index = i;
+
+      cell.addEventListener("click", function () {
+        if (cell.classList.contains("revealed")) return;
+
+        if (bombIndexes.includes(i)) {
+          cell.classList.add("bomb", "revealed");
+          cell.textContent = "💩";
+          setTimeout(() => {
+            alert("باختی! 😢");
+            window.location.href = "index.html";
+          }, 1000);
+        } else {
+          revealed++;
+          profit = Math.floor(betAmount * (1 + revealed * multiplierStep));
+          document.getElementById("profit").textContent = profit;
+          cell.classList.add("revealed");
+          cell.textContent = "✅";
+        }
+      });
+
+      grid.appendChild(cell);
+    }
+
+    function generateRandomBombs(count) {
+      const indexes = [];
+      while (indexes.length < count) {
+        const r = Math.floor(Math.random() * totalCells);
+        if (!indexes.includes(r)) indexes.push(r);
+      }
+      return indexes;
+    }
+
+    function cashOut() {
+      alert("برداشت موفق! سود شما: " + profit + " تومان");
+      // می‌تونی اینجا سود رو به سرور ارسال کنی یا در localStorage ذخیره کنی
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>
